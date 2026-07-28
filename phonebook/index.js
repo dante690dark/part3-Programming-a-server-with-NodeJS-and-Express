@@ -58,8 +58,11 @@ app.get("/api/persons/:id", (request, response) => {
 app.post("/api/person", (request, response) => {
   const { name, number } = request.body;
 
-  if (!request.body)
+  if (!name || !number)
     return response.status(400).json({ error: "content missing" });
+
+  if (persons.includes(name))
+    return response.status(400).json({ error: "name must be unique" });
 
   const person = {
     name,
