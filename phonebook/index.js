@@ -48,6 +48,13 @@ app.get("/info", (request, response) => {
   `);
 });
 
+app.get("/api/persons/", (request, response) => {
+  if (!persons.length)
+    return response.status(400).json({ error: "content missing" });
+
+  return response.json(persons);
+});
+
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
   const person = persons.find((note) => note.id === id);
@@ -61,7 +68,9 @@ app.post("/api/person", (request, response) => {
   if (!name || !number)
     return response.status(400).json({ error: "content missing" });
 
-  if (persons.includes(name))
+  const isDuplicate = persons.some((e) => e.name === name);
+
+  if (isDuplicate)
     return response.status(400).json({ error: "name must be unique" });
 
   const person = {
@@ -70,14 +79,20 @@ app.post("/api/person", (request, response) => {
     id: generateID(),
   };
 
-  response.json(person);
+  persons.push(person);
+
+  response.json(persons);
 });
 
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  const person = persons.filter((person) => person.id !== id);
 
-  response.status(204).end();
+  const isId = persons.some((e) => e.id === id);
+
+  if (!isId) return response.status(400).json({ error: "user doesn't exist" });
+
+  const person = persons.filter((person) => person.id !== id);
+  response.json(person);
 });
 
 const PORT = 3001;
