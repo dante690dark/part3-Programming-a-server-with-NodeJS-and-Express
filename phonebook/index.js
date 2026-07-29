@@ -87,12 +87,14 @@ app.post("/api/person", (request, response) => {
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
 
-  const isId = persons.some((e) => e.id === id);
+  const index = persons.findIndex((e) => e.id === id);
 
-  if (!isId) return response.status(400).json({ error: "user doesn't exist" });
+  if (index === -1)
+    return response.status(404).json({ error: "user doesn't exist" });
 
-  const person = persons.filter((person) => person.id !== id);
-  response.json(person);
+  persons.splice(index, 1);
+
+  response.json(persons);
 });
 
 const PORT = 3001;
